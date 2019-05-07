@@ -1,0 +1,200 @@
+<template>
+  <a-drawer
+    title="新增职位"
+    :maskClosable="false"
+    width="600"
+    placement="right"
+    :closable="false"
+    @close="onClose"
+    :visible="postAddVisiable"
+    style="height: calc(100% - 55px);overflow: auto;padding-bottom: 53px;"
+  >
+    <a-form :form="form">
+      <a-row>
+        <a-col>
+          <a-form-item label="职位标题:" v-bind="formItemLayout">
+            <a-input  v-decorator="['name']"/>
+          </a-form-item>
+        </a-col>
+      </a-row>
+
+      <a-row>
+        <a-col>
+          <a-form-item label="招聘地址" v-bind="formItemLayout">
+            <a-input  v-decorator="['address']"/>
+          </a-form-item>
+        </a-col>
+      </a-row>
+
+      <a-row>
+        <a-col>
+          <a-form-item label="学历要求" v-bind="formItemLayout">
+            <education-background-input-tree
+              @change="onEducationBackgroundChange"
+              ref="educationBackgroundTree"
+            ></education-background-input-tree>
+          </a-form-item>
+        </a-col>
+      </a-row>
+
+      <a-row>
+        <a-col>
+          <a-form-item label="薪资范围" v-bind="formItemLayout">
+            <salary-input-tree @change="onSalaryChange" ref="salaryTree"></salary-input-tree>
+          </a-form-item>
+        </a-col>
+      </a-row>
+
+      <a-row>
+        <a-col>
+          <a-form-item label="公司名称" v-bind="formItemLayout">
+            <a-input  v-decorator="['issueCompany']"/>
+          </a-form-item>
+        </a-col>
+      </a-row>
+      <a-row>
+        <a-col>
+          <a-form-item label="工作经验" v-bind="formItemLayout">
+            <work-years-input-tree @change="onWorkYearsChange" ref="workYearsTree"></work-years-input-tree>
+          </a-form-item>
+        </a-col>
+      </a-row>
+
+      <a-row>
+        <a-col>
+          <a-form-item label="职位类型" v-bind="formItemLayout">
+            <position-sort-input-tree @change="onPositionSortChange" ref="positionSortTree"></position-sort-input-tree>
+          </a-form-item>
+        </a-col>
+      </a-row>
+
+      <a-row>
+        <a-col>
+          <a-form-item label="职位描述" v-bind="formItemLayout">
+            <a-textarea
+              :rows="4"
+              v-decorator="[
+              'description',
+              {rules: [
+                { max: 100, message: '长度不能超过100个字符'}
+              ]}]"
+            ></a-textarea>
+          </a-form-item>
+        </a-col>
+      </a-row>
+
+      <a-row>
+        <a-col>
+          <a-form-item label="职责要求" v-bind="formItemLayout">
+            <a-textarea
+              :rows="4"
+              v-decorator="[
+              'requested',
+              {rules: [
+                { max: 100, message: '长度不能超过100个字符'}
+              ]}]"
+            ></a-textarea>
+          </a-form-item>
+        </a-col>
+      </a-row>
+    </a-form>
+    <div class="drawer-bootom-button">
+      <a-popconfirm title="确定放弃编辑？" @confirm="onClose" okText="确定" cancelText="取消">
+        <a-button style="margin-right: .8rem">取消</a-button>
+      </a-popconfirm>
+      <a-button @click="handleSubmit" type="primary" :loading="loading">提交</a-button>
+    </div>
+  </a-drawer>
+</template>
+<script>
+import moment from "moment";
+import { mapState } from "vuex";
+import EducationBackgroundInputTree from "@/components/dropbox/EducationBackgroundInputTree";
+import WorkYearsInputTree from "@/components/dropbox/WorkYearsInputTree";
+import PositionSortInputTree from "@/components/dropbox/PositionSortInputTree";
+import SalaryInputTree from "@/components/dropbox/SalaryInputTree";
+
+const formItemLayout = {
+  labelCol: { span: 3 },
+  wrapperCol: { span: 18 }
+};
+
+export default {
+  name: "PostAdd",
+  components: {
+    EducationBackgroundInputTree,
+    WorkYearsInputTree,
+    PositionSortInputTree,
+    SalaryInputTree
+  },
+  props: {
+    postAddVisiable: {
+      default: false
+    }
+  },
+  data() {
+    return {
+      position: {},
+      positionSort: "",
+      salary: "",
+      needEducation: "",
+      needWorkTime: "",
+      dateFormat: "YYYY/MM/DD",
+      loading: false,
+      formItemLayout,
+      form: this.$form.createForm(this),
+    };
+  },
+  computed: {
+    ...mapState({
+      user: state => state.account.user
+    })
+  },
+  methods: {
+    moment,
+    reset() {
+      this.loading = false;
+      this.form.resetFields();
+    },
+    onPositionSortChange(value) {
+      this.positionSort = value || "";
+    },
+    onEducationBackgroundChange(value) {
+      this.needEducation = value || "";
+    },
+    onWorkYearsChange(value) {
+      this.needWorkTime = value || "";
+    },
+    onSalaryChange(value) {
+      this.salary = value || "";
+    },
+    onClose() {
+      this.reset();
+      this.$emit("close");
+    },
+    handleSubmit() {
+      this.form.validateFields((err, values) => {
+        this.position = Object.assign(values);
+        this.position.userId = this.user.userId;
+        this.position.salary = this.salary;
+        this.position.needWorkTime = this.needWorkTime;
+        this.position.needEducation = this.needEducation;
+        this.position.positionSort = this.positionSort;
+        console.log(this.position)
+        if (!err) {
+          this.$post("position", {
+            ...this.position
+          })
+            .then(() => {
+              this.reset();
+              this.$emit("success");
+            })
+            .catch(() => {
+              this.loading = false;
+            });
+        }
+      });
+    }
+  }
+};
+</script>

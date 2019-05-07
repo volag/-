@@ -4,6 +4,7 @@ import router from './router'
 import Antd from 'ant-design-vue'
 import store from './store'
 import request from 'utils/request'
+import global from 'utils/global'
 import db from 'utils/localstorage'
 import VueApexCharts from 'vue-apexcharts'
 
@@ -24,6 +25,7 @@ Vue.use({
   }
 })
 
+Vue.prototype.GLOBAL = global
 Vue.prototype.$post = request.post
 Vue.prototype.$get = request.get
 Vue.prototype.$put = request.put

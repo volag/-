@@ -57,7 +57,7 @@ export default {
       user: state => state.account.user
     }),
     avatar () {
-      return `static/avatar/${this.user.avatar}`
+      return `http://pqggd9642.bkt.clouddn.com/${this.user.avatar}`
     },
     sex () {
       switch (this.user.ssex) {

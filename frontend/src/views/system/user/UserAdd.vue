@@ -51,9 +51,9 @@
         <a-tree-select
           :allowClear="true"
           :dropdownStyle="{ maxHeight: '220px', overflow: 'auto' }"
-          :treeData="deptTreeData"
-          v-decorator="['deptId']"
-          v-model="user.deptId">
+          :treeData="companyTreeData"
+          v-decorator="['companyName']"
+          v-model="user.companyName">
         </a-tree-select>
       </a-form-item>
       <a-form-item label='状态' v-bind="formItemLayout">
@@ -101,7 +101,7 @@ export default {
       },
       loading: false,
       roleData: [],
-      deptTreeData: [],
+      companyTreeData: [],
       formItemLayout,
       defaultPassword: '1234qwer',
       form: this.$form.createForm(this),
@@ -140,6 +140,7 @@ export default {
         }
       })
     },
+    
     handleUserNameBlur () {
       let username = this.user.username.trim()
       if (username.length) {
@@ -173,8 +174,8 @@ export default {
         this.$get('role').then((r) => {
           this.roleData = r.data.rows
         })
-        this.$get('dept').then((r) => {
-          this.deptTreeData = r.data.rows.children
+        this.$get('company').then((r) => {
+          this.companyTreeData = r.data.rows
         })
       }
     }

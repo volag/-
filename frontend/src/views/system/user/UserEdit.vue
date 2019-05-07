@@ -44,9 +44,9 @@
         <a-tree-select
           :allowClear="true"
           :dropdownStyle="{ maxHeight: '220px', overflow: 'auto' }"
-          :treeData="deptTreeData"
-          @change="onDeptChange"
-          :value="userDept">
+          :treeData="companyTreeData"
+          @change="onCompanyChange"
+          :value="userCompany">
         </a-tree-select>
       </a-form-item>
       <a-form-item label='状态' v-bind="formItemLayout">
@@ -97,9 +97,9 @@ export default {
     return {
       formItemLayout,
       form: this.$form.createForm(this),
-      deptTreeData: [],
+      companyTreeData: [],
       roleData: [],
-      userDept: [],
+      userCompany: [],
       userId: '',
       loading: false
     }
@@ -134,12 +134,12 @@ export default {
         let roleArr = user.roleId.split(',')
         this.form.setFieldsValue({'roleId': roleArr})
       }
-      if (user.deptId) {
-        this.userDept = [user.deptId]
+      if (user.companyName) {
+        this.userCompany = [user.companyName]
       }
     },
-    onDeptChange (value) {
-      this.userDept = value
+    onCompanyChange (value) {
+      this.userCompany = value
     },
     handleSubmit () {
       this.form.validateFields((err, values) => {
@@ -148,7 +148,7 @@ export default {
           let user = this.form.getFieldsValue()
           user.roleId = user.roleId.join(',')
           user.userId = this.userId
-          user.deptId = this.userDept
+          user.companyName = this.userCompany
           this.$put('user', {
             ...user
           }).then((r) => {
@@ -173,8 +173,8 @@ export default {
         this.$get('role').then((r) => {
           this.roleData = r.data.rows
         })
-        this.$get('dept').then((r) => {
-          this.deptTreeData = r.data.rows.children
+        this.$get('company').then((r) => {
+          this.companyTreeData = r.data.rows
         })
       }
     }

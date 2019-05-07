@@ -16,7 +16,7 @@ let constRouter = [
     name: '登录页',
     component: LoginView
   },
-  {
+  { 
     path: '/index',
     name: '首页',
     redirect: '/home'
